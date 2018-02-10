@@ -10,7 +10,16 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import org.bson.Document;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.util.JSON;
 
 @WebServlet(asyncSupported = true, urlPatterns = { "/SampleWebService" })
 public class SampleWebService extends HttpServlet {
@@ -19,9 +28,14 @@ public class SampleWebService extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	// private MongodbUtils utils = MongodbUtils.getInstance();
+	/*
+	 * private MongoClient client; private MongoDatabase database;
+	 */
 
 	public SampleWebService() {
 		super();
+		// client = utils.getMongoClientInstance();
 	}
 
 	@Override
@@ -43,8 +57,7 @@ public class SampleWebService extends HttpServlet {
 			@Override
 			public void run() {
 				try {
-					handleMultipleRequest (acontext.getRequest(),
-							 acontext.getResponse());
+					handleMultipleRequest(acontext.getRequest(), acontext.getResponse());
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
@@ -53,13 +66,24 @@ public class SampleWebService extends HttpServlet {
 			}
 
 			protected void handleMultipleRequest(ServletRequest request, ServletResponse response) throws IOException {
-				HttpSession session = ((HttpServletRequest) request).getSession();
+				((HttpServletRequest) request).getSession();
 				String data = getBody(request);
 				System.out.println("Request data -> " + data);
-				
-				
+				MongoClient mongo = new MongoClient("localhost", 27017);
+				MongoDatabase database = mongo.getDatabase("local_db");
+
+				MongoCollection<Document> collection = database.getCollection("employee_details");
+
+				MongoCursor<Document> iterator = collection.find().iterator();
+
+				BasicDBList list = new BasicDBList();
+				while (iterator.hasNext()) {
+					Document doc = iterator.next();
+					list.add(doc);
+				}
+
 				((HttpServletResponse) response).setHeader("Content-Type", "text/xml; charset=UTF-8");
-				response.getWriter().write(data);
+				response.getWriter().write(JSON.serialize(list));
 				return;
 			}
 
