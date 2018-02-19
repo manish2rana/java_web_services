@@ -15,7 +15,6 @@ import org.bson.Document;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.MongoClient;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -28,15 +27,18 @@ public class SampleWebService extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	// private MongodbUtils utils = MongodbUtils.getInstance();
-	/*
-	 * private MongoClient client; private MongoDatabase database;
-	 */
+	
 
 	public SampleWebService() {
 		super();
-		// client = utils.getMongoClientInstance();
 	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -52,6 +54,7 @@ public class SampleWebService extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		//req.setAsyncSupported(true);
 		final AsyncContext acontext = req.startAsync();
 		acontext.start(new Runnable() {
 			@Override
